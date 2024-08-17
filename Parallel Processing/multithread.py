@@ -1,10 +1,11 @@
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from time import sleep # used to simulate waiting on a task
+import time
 
-import requests
+import requests # used to make api call for example
+
+
 # Example to process
-
 def long_api_call(currencyId: str):
 
     url = f"https://api.exchange.coinbase.com/currencies/{currencyId}"
@@ -13,12 +14,29 @@ def long_api_call(currencyId: str):
     headers = {}
 
     response = requests.request("GET", url, headers=headers, data=payload).json()
+    # add sleep to simulate a long response
+    time.sleep(5)
 
     return currencyId, response['status']
 
+
 if __name__ == '__main__':
 
-    x, y = long_api_call("ADA")
+    # list of currencies to make calls for
+    currency_list = ['ADA', 'XTZ', 'ETH', 'BTC']
 
-    print(x, y)
+    # iterative example
+    start = time.time()
+    
+    print(f'Id\tStatus')
+    for currencyId in currency_list:
+        id, status = long_api_call(currencyId)
+        print(f'{id}\t{status}')
+    
+    endtime = time.time() - start
+    print(f'Iterative process completed {len(currency_list)} calls in {endtime} seconds')
+
+    # with ThreadPoolExecutor() as executor:
+
+
 
